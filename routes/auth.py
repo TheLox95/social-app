@@ -1,14 +1,19 @@
 from datetime import datetime, timedelta, timezone
-from fastapi import APIRouter, HTTPException
+from typing import Annotated
+from fastapi import APIRouter, Cookie, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from models.User import User
 from db import db
-from schemas.Auth import LoginRequest, RegisterRequest
+from schemas.auth import LoginRequest, RegisterRequest
 from pwdlib import PasswordHash
 import jwt
 import os
+
+from services.auth import get_token_data
+
+REFRESH_TOKEN_EXPIRE_MINUTES = 15
 
 router = APIRouter(tags=["auth"])
 
@@ -29,7 +34,7 @@ def login(body: LoginRequest):
         if not secret:
             raise HTTPException(status_code=500, detail="App is not ready")
 
-        token_expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+        token_expire = datetime.now(timezone.utc) + timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES )
         payload = { "id": user.id, "token_type": "access", "exp": token_expire }
         access_token = jwt.encode(payload, secret, algorithm="HS256")
 
@@ -59,3 +64,24 @@ def register(body: RegisterRequest):
         session.commit()
 
         return { "success": True }
+
+@router.get("/refresh")
+def refresh_token(refresh_token : Annotated[str | None, Cookie()] = None):
+    secret = os.getenv("JWT_SECRET")
+    if secret is None:
+        raise HTTPException(status_code=500, detail='App is not ready')
+    if refresh_token is None:
+        raise HTTPException(status_code=401, detail='Missing refresh_token')
+
+    try:
+        usr = jwt.decode(refresh_token, secret, algorithms="HS256")
+    except Exception:
+        raise HTTPException(status_code=401, detail='Could not validate credentials')
+
+    token_expire = datetime.now(timezone.utc) + timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES )
+    payload = { "id": usr.get("id"), "token_type": "access", "exp": token_expire}
+    access_token = jwt.encode(payload, secret, algorithm="HS256")
+
+    res = JSONResponse(content={'access_token': access_token})
+    return res
+
