@@ -8,12 +8,32 @@ class LoginRequest(BaseModel):
     email: EmailStr
     password: SecretStr
 
+    @field_validator("email", mode="before")
+    @classmethod
+    def clean_email(cls, email: EmailStr) -> EmailStr:
+        return email.strip().lower()
+
 class RegisterRequest(BaseModel):
     email: EmailStr
     password: SecretStr
     confirmPassword: SecretStr
-    fullname: str
+    fullname: str = Field(max_length=12)
     username: str = Field(max_length=12)
+
+    @field_validator('fullname', mode='before')
+    @classmethod
+    def sanitize_fullname(cls, fullname: str) -> str:
+        return fullname.strip()
+
+    @field_validator('username', mode='before')
+    @classmethod
+    def sanitize_username(cls, username: str) -> str:
+        return username.strip()
+
+    @field_validator('email', mode='before')
+    @classmethod
+    def sanitize_email(cls, email: EmailStr) -> EmailStr:
+        return email.strip().lower()
 
     @field_validator('password', mode='after')
     @classmethod

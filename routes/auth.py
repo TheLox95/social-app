@@ -11,8 +11,6 @@ from pwdlib import PasswordHash
 import jwt
 import os
 
-from services.auth import get_token_data
-
 REFRESH_TOKEN_EXPIRE_MINUTES = 15
 
 router = APIRouter(tags=["auth"])

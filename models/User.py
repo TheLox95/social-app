@@ -15,6 +15,3 @@ class User(db.DBModel):
     created_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)
 
-
-db.DBModel.metadata.create_all(db.engine)
-
