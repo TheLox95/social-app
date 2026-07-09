@@ -22,7 +22,7 @@ def test_failed_login():
 
 def test_sucess_login():
     """ should return access token in the cookies when user exits on DB """
-    response = client.post("/login", json={"email": "mail@mail.com", "password": "123456Abc!"})
+    response = client.post("/login", json={"email": "mail10@mail.com", "password": "123456Abc!"})
     assert response.status_code == 200
     token = response.cookies.get("refresh_token")
     assert token is not None
@@ -33,6 +33,6 @@ def test_sucess_login():
 def test_register():
     """ should register with the correct body """
     
-    response = client.post("/register", json={"email": "mail@mail.com", "password": "123456Abc!", "confirmPassword": "123456Abc!", 'fullname': "Joe doe", 'username':"joe"})
+    response = client.post("/register", json={"email": "joe1@mail.com", "password": "123456Abc!", "confirmPassword": "123456Abc!", 'fullname': "Joe doe", 'username':"joe"})
     assert response.status_code == 200
 
