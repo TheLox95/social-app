@@ -4,7 +4,7 @@ from fastapi import APIRouter, Cookie, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from models.User import User
+from models.user import User
 from db import db
 from schemas.auth import LoginRequest, RegisterRequest
 from pwdlib import PasswordHash

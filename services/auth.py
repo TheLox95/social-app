@@ -5,9 +5,11 @@ from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 import jwt
 
+from models.user_auth import UserAuth
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-def get_token_data(token: str = Depends(oauth2_scheme)) -> dict[str, int]:
+def get_token_data(token: str = Depends(oauth2_scheme)) -> UserAuth:
     secret = os.getenv("JWT_SECRET")
     if not secret:
         raise HTTPException(status_code=500, detail="App is not ready")
@@ -29,4 +31,4 @@ def get_token_data(token: str = Depends(oauth2_scheme)) -> dict[str, int]:
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"})
 
-    return {"id": user_id}
+    return UserAuth(id=user_id)

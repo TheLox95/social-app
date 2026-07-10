@@ -1,6 +1,6 @@
 from datetime import datetime
 from sqlalchemy import String, func
-from sqlalchemy.orm import mapped_column, Mapped
+from sqlalchemy.orm import mapped_column, Mapped, relationship
 from db import db
 
 class User(db.DBModel):
@@ -11,6 +11,8 @@ class User(db.DBModel):
     password: Mapped[str] = mapped_column(String(256))
     email: Mapped[str] = mapped_column(String())
     username: Mapped[str] = mapped_column(String(18), unique=True)
+
+    posts: Mapped['Post'] = relationship(back_populates="user", cascade="all, delete-orphan")
 
     created_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)

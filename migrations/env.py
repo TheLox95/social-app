@@ -8,7 +8,7 @@ from alembic import context
 
 from dotenv import load_dotenv
 from db.db import DBModel
-from models import User
+from models import user, post
 
 load_dotenv()
 
@@ -23,7 +23,8 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-target_metadata = User.User.metadata
+target_metadata = user.User.metadata
+target_metadata = post.Post.metadata
 target_metadata = DBModel.metadata
 
 # other values from the config, defined by the needs of env.py,

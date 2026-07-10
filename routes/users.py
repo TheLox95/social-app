@@ -3,7 +3,7 @@ from fastapi.routing import APIRouter
 from sqlalchemy.orm import Session
 
 from db import db
-from models.User import User
+from models.user import User
 from services.auth import get_token_data
 
 router = APIRouter(tags=["auth"])

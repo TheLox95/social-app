@@ -2,7 +2,7 @@
 from sqlalchemy import ScalarResult, select
 from sqlalchemy.orm import Session
 
-from models.User import User
+from models.user import User
 
 class FindUsersParams:
     def __init__(self, username: str | None = None, email: str | None = None):
