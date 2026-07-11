@@ -1,27 +1,26 @@
-"""seed users
+"""seed 1
 
-Revision ID: 54a1ed1f517f
-Revises: 52284bde47f4
-Create Date: 2026-07-09 11:00:07.032072
+Revision ID: 55c8a10d2dd9
+Revises: a7b158255bb8
+Create Date: 2026-07-10 20:29:22.540869
 
 """
-
 from typing import Sequence, Union
 
 from alembic import op
-from sqlalchemy.sql import table, column
+import sqlalchemy as sa
+from sqlalchemy.sql import column, table
 
 
 # revision identifiers, used by Alembic.
-revision: str = "54a1ed1f517f"
-down_revision: Union[str, Sequence[str], None] = "52284bde47f4"
+revision: str = '55c8a10d2dd9'
+down_revision: Union[str, Sequence[str], None] = 'a7b158255bb8'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
     """Upgrade schema."""
-
     users = [
         {
             "fullname": "Joe Doe",
@@ -39,6 +38,7 @@ def upgrade() -> None:
     )
 
     op.bulk_insert(table_obj, users)
+    pass
 
 
 def downgrade() -> None:

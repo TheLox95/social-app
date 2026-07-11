@@ -8,8 +8,10 @@ class FindPostParams:
     def __init__(
         self,
         user_id: int | None = None,
+        id: str | None = None,
         fields: list[InstrumentedAttribute] | None = None,
     ):
+        self.id = id
         self.user_id = user_id
         self.fields = fields
 
@@ -24,6 +26,9 @@ def find_post(params: FindPostParams, session: Session) -> Result:
 
     if params.user_id is not None:
         query = query.where(Post.user_id == params.user_id)
+
+    if params.id is not None:
+        query = query.where(Post.id == params.id)
 
     return session.execute(query)
 

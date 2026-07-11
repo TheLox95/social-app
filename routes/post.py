@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from db.db import get_db
@@ -35,7 +35,11 @@ def create_post_req(
 # edit post
 @router.put("/", response_model=SuccessResponse)
 def update_post_route(body: UpdatePostRequest, session: Session = Depends(get_db), usr: UserAuth = Depends(get_token_data)):
-    update_post(UpdatePostParams(content=body.content, post_id=body.id, user_id=usr.id), session)
+    post = find_post(FindPostParams(user_id=usr.id, id=body.id.__str__()), session).first()
+    if post is None:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    update_post(UpdatePostParams(content=body.content, post_id=body.id.__str__(), user_id=usr.id), session)
     session.commit()
 
     return { "success": True }
@@ -44,7 +48,10 @@ def update_post_route(body: UpdatePostRequest, session: Session = Depends(get_db
 # delete post
 @router.delete("/", response_model=SuccessResponse)
 def delete_post_route(body: DeletePostRequest, session: Session = Depends(get_db), usr: UserAuth = Depends(get_token_data)):
-    delete_post(DeletePostParams(post_id=body.id, user_id=usr.id), session)
+    post = find_post(FindPostParams(user_id=usr.id, id=body.id.__str__()), session).first()
+    if post is None:
+        raise HTTPException(status_code=404, detail="Post not found")
+    delete_post(DeletePostParams(post_id=body.id.__str__(), user_id=usr.id), session)
     session.commit()
 
     return { "success": True}

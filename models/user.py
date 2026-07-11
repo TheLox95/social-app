@@ -1,7 +1,10 @@
 from datetime import datetime
+import typing
 from sqlalchemy import String, func
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from db import db
+
+from .post import Post
 
 class User(db.DBModel):
     __tablename__ = "users"
@@ -12,7 +15,7 @@ class User(db.DBModel):
     email: Mapped[str] = mapped_column(String())
     username: Mapped[str] = mapped_column(String(18), unique=True)
 
-    posts: Mapped['Post'] = relationship(back_populates="user", cascade="all, delete-orphan")
+    posts: Mapped[list['Post']] = relationship("Post",back_populates="user", passive_deletes=True)
 
     created_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)
