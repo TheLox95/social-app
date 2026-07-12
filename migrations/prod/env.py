@@ -9,7 +9,7 @@ from alembic import context
 
 from dotenv import load_dotenv
 from db.db import DBModel
-from models import user, post
+from models import post_comment, post_like, user, post
 
 load_dotenv()
 
@@ -26,6 +26,8 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 target_metadata = user.User.metadata
 target_metadata = post.Post.metadata
+target_metadata = post_comment.PostComment.metadata
+target_metadata = post_like.PostLike.metadata
 target_metadata = DBModel.metadata
 
 # other values from the config, defined by the needs of env.py,

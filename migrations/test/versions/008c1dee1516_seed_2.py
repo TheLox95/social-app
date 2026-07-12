@@ -14,6 +14,8 @@ from sqlalchemy.orm import sessionmaker
 
 from models.user import User
 from models.post import Post
+from models.post_comment import PostComment
+from models.post_like import PostLike
 
 # revision identifiers, used by Alembic.
 revision: str = '008c1dee1516'
@@ -58,9 +60,38 @@ def upgrade() -> None:
         fullname="joe doe",
         username="poster4",
     )
+    like_user = User(
+        email="like1@mail.com",
+        password="$argon2id$v=19$m=65536,t=3,p=4$wFBCoZUQcRxZSw4WOdXt4A$ubCqS8YRZ0I/c2S72rcD9jdrD9hcxkXkRs4yX7FeTIU",
+        fullname="joe doe",
+        username="like1",
+    )
+    liked_user = User(
+        email="liked1@mail.com",
+        password="$argon2id$v=19$m=65536,t=3,p=4$wFBCoZUQcRxZSw4WOdXt4A$ubCqS8YRZ0I/c2S72rcD9jdrD9hcxkXkRs4yX7FeTIU",
+        fullname="joe doe",
+        username="liked1",
+    )
+    commented_user = User(
+        email="commented1@mail.com",
+        password="$argon2id$v=19$m=65536,t=3,p=4$wFBCoZUQcRxZSw4WOdXt4A$ubCqS8YRZ0I/c2S72rcD9jdrD9hcxkXkRs4yX7FeTIU",
+        fullname="joe doe",
+        username="commented1",
+    )
+    commenter_user = User(
+        email="commenter1@mail.com",
+        password="$argon2id$v=19$m=65536,t=3,p=4$wFBCoZUQcRxZSw4WOdXt4A$ubCqS8YRZ0I/c2S72rcD9jdrD9hcxkXkRs4yX7FeTIU",
+        fullname="joe doe",
+        username="commenter",
+    )
+
     session.add(user)
     session.add(edit_user)
     session.add(del_user)
+    session.add(like_user)
+    session.add(liked_user)
+    session.add(commented_user)
+    session.add(commenter_user)
     session.flush()
 
     posts = [
@@ -85,6 +116,16 @@ def upgrade() -> None:
             id="019f4d5b-ca42-75e4-90e7-01a8d06e7acd",
             content="this post should not exits. it was delete from pytest",
             user_id=del_user.id,
+        ),
+        Post(
+            id="019f52f8-905e-7e34-9456-071da4df492b",
+            content="this post should have a like at the end of the test",
+            user_id=liked_user.id,
+        ),
+        Post(
+            id="019f53c8-44a6-7910-a289-548a53ee444e",
+            content="this post should have a comment at the end of the test",
+            user_id=commented_user.id,
         ),
     ]
     session.add_all(posts)

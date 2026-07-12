@@ -11,6 +11,8 @@ from db import db
 
 if typing.TYPE_CHECKING:
     from .user import User
+    from .post_comment import PostComment
+    from .post_like import PostLike
 
 class Post(db.DBModel):
     __tablename__ = "posts"
@@ -20,6 +22,9 @@ class Post(db.DBModel):
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="cascade"))
     user: Mapped['User'] = relationship("User",back_populates="posts", single_parent=True)
+
+    comments: Mapped[list['PostComment']] = relationship("PostComment")
+    likes: Mapped[list['PostLike']] = relationship("PostLike")
 
     created_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)
