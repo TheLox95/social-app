@@ -7,7 +7,7 @@ class SuccessResponse(BaseModel):
     success: bool = True
 
 class LikeResponse(BaseModel):
-    id: int
+    author_id: int
 
 class PostListResponse(BaseModel):
     id: UUID7
@@ -45,6 +45,7 @@ class LikePostRequest(BaseModel):
 class CommentPostRequest(BaseModel):
     post_id: UUID7
     content: str
+    parent_comment_id: int | None = None
 
     @field_validator("content")
     @classmethod

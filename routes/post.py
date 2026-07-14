@@ -18,12 +18,14 @@ from services.auth import get_token_data
 from services.post import (
     CommentPostParams,
     CreatePostParams,
+    DeleteLikePostParams,
     DeletePostParams,
     FindPostParams,
     LikePostParams,
     UpdatePostParams,
     comment_post,
     create_post,
+    delete_like_post,
     delete_post,
     find_post,
     like_post,
@@ -38,7 +40,10 @@ router = APIRouter(prefix="/post", tags=["post"])
 def list_posts(
     usr: UserAuth = Depends(get_token_data), session: Session = Depends(get_db)
 ):
-    posts = find_post(FindPostParams(user_id=usr.id, include_likes=True, include_comments=True), session).all()
+    posts = find_post(
+        FindPostParams(user_id=usr.id, include_likes=True, include_comments=True),
+        session,
+    ).all()
     return posts
 
 
@@ -103,9 +108,21 @@ def like_post_request(
     session: Session = Depends(get_db),
     usr: UserAuth = Depends(get_token_data),
 ):
-    like_post(LikePostParams(post_id=body.post_id.__str__(), author_id=usr.id), session)
-    session.commit()
+    post_id = body.post_id.__str__()
+    post = find_post(FindPostParams(id=post_id, include_likes=True), session).first()
+    if post is None:
+        raise HTTPException(status_code=404, detail="Post not found")
 
+    like_found = next((like for like in post.likes if like.author_id == usr.id), None)
+
+    if like_found is None:
+        like_post(LikePostParams(post_id=post_id, author_id=usr.id), session)
+    else:
+        delete_like_post(
+            DeleteLikePostParams(post_id=post_id, author_id=usr.id, like_id=like_found.id), session
+        )
+
+    session.commit()
     return {"succes": True}
 
 
@@ -116,7 +133,15 @@ def comment_post_request(
     session: Session = Depends(get_db),
     usr: UserAuth = Depends(get_token_data),
 ):
-    comment_post(CommentPostParams(post_id=body.post_id.__str__(), author_id=usr.id, content=body.content), session)
+    comment_post(
+        CommentPostParams(
+            post_id=body.post_id.__str__(),
+            author_id=usr.id,
+            content=body.content,
+            parent_comment_id=body.parent_comment_id,
+        ),
+        session,
+    )
     session.commit()
 
     return {"succes": True}

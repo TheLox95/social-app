@@ -12,17 +12,17 @@ class FindPostParams:
         user_id: int | None = None,
         id: str | None = None,
         include_likes: bool = False,
-        include_comments: bool = False, 
+        include_comments: bool = False,
         fields: list[InstrumentedAttribute] | None = None,
     ):
         self.id = id
         self.user_id = user_id
         self.fields = fields
-        self.include_likes = include_likes 
-        self.include_comments = include_comments  
+        self.include_likes = include_likes
+        self.include_comments = include_comments
 
 
-def find_post(params: FindPostParams, session: Session) -> ScalarResult | Result:
+def find_post(params: FindPostParams, session: Session) -> ScalarResult[Post] | Result:
     if params.fields is not None and len(params.fields) > 0:
         query = select().options(noload("*"))
         query = query.add_columns(*params.fields)
@@ -74,34 +74,71 @@ def update_post(params: UpdatePostParams, session: Session) -> Result:
     )
     return session.execute(query)
 
-class DeletePostParams():
+
+class DeletePostParams:
     def __init__(self, post_id: str, user_id: int):
         self.id = post_id
         self.user_id = user_id
 
+
 def delete_post(params: DeletePostParams, session: Session):
-    query = delete(Post).where(Post.id == params.id).where(Post.user_id == params.user_id)
+    query = (
+        delete(Post).where(Post.id == params.id).where(Post.user_id == params.user_id)
+    )
 
     return session.execute(query)
 
-class LikePostParams():
+
+class LikePostParams:
     def __init__(self, post_id: str, author_id: int):
         self.post_id = post_id
         self.author_id = author_id
+
 
 def like_post(params: LikePostParams, session: Session):
     query = insert(PostLike).values(post_id=params.post_id, author_id=params.author_id)
 
     return session.execute(query)
 
-class CommentPostParams():
-    def __init__(self, post_id: str, author_id: int, content: str):
-        self.post_id = post_id
-        self.author_id = author_id
-        self.content = content
 
-def comment_post(params: CommentPostParams, session: Session):
-    query = insert(PostComment).values(post_id=params.post_id, author_id=params.author_id, content=params.content)
+class DeleteLikePostParams:
+    def __init__(self, post_id: str, author_id: int, like_id: int):
+        self.post_id = post_id
+        self.like_id = like_id
+        self.author_id = author_id
+
+
+def delete_like_post(params: DeleteLikePostParams, session: Session):
+    query = (
+        delete(PostLike)
+        .where(PostLike.post_id == params.post_id)
+        .where(PostLike.author_id == params.author_id)
+        .where(PostLike.id == params.like_id)
+    )
 
     return session.execute(query)
 
+
+class CommentPostParams:
+    def __init__(
+        self,
+        post_id: str,
+        author_id: int,
+        content: str,
+        parent_comment_id: int | None = None,
+    ):
+        self.post_id = post_id
+        self.author_id = author_id
+        self.content = content
+        self.parent_comment_id = parent_comment_id
+
+
+def comment_post(params: CommentPostParams, session: Session):
+    query = insert(PostComment).values(
+        post_id=params.post_id,
+        author_id=params.author_id,
+        content=params.content,
+        parent_comment_id=params.parent_comment_id,
+    )
+
+    return session.execute(query)

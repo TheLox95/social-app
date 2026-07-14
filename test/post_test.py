@@ -165,6 +165,34 @@ def test_like_post():
     assert found is not None
     assert len(found.get("likes")) == 1
 
+    # call like API again to 'delete' the like
+    response = client.post(
+        "/login", json={"email": "like1@mail.com", "password": "123456Abc!"}
+    )
+    assert response.status_code == 200
+    data = response.json()
+
+    response = client.post(
+        "/post/like",
+        json={"post_id": post_id},
+        headers={"Authorization": "Bearer {}".format(data.get("access_token"))},
+    )
+    assert response.status_code == 200
+
+    response = client.post(
+        "/login", json={"email": "liked1@mail.com", "password": "123456Abc!"}
+    )
+    assert response.status_code == 200
+    data = response.json()
+
+    response = client.get(
+        "/post", headers={"Authorization": "Bearer {}".format(data.get("access_token"))}
+    )
+    posts = response.json()
+    assert len(posts) == 1
+    found = next((p for p in posts if p.get("id") == post_id), None)
+    assert found is not None
+    assert len(found.get("likes")) == 0
 
 def test_comment_post():
     response = client.post(
