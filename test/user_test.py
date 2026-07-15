@@ -87,3 +87,46 @@ def test_block_user():
     assert response.status_code == 200
     profile = response.json()
     assert len(profile.get("blocked_by")) == 0
+
+def test_directmessage_user():
+    # test user exist
+    response = client.post(
+        "/login", json={"email": "dm_sender1@mail.com", "password": "123456Abc!"}
+    )
+    assert response.status_code == 200
+    sender_cred = response.json()
+
+    response = client.post(
+        "/message/99", json={"content": "dm 1"}, headers={"Authorization": "Bearer {}".format(sender_cred.get("access_token"))}
+    )
+    assert response.status_code == 404
+    data = response.json()
+    assert data.get("detail") == "User not found"
+    # test user receives message
+    response = client.post(
+        "/message/152", json={"content": "dm 1"}, headers={"Authorization": "Bearer {}".format(sender_cred.get("access_token"))}
+    )
+    assert response.status_code == 200
+
+    response = client.post(
+        "/login", json={"email": "dm_receiver1@mail.com", "password": "123456Abc!"}
+    )
+    assert response.status_code == 200
+    receiver_cred = response.json()
+
+    response = client.get(
+        "/messages", headers={"Authorization": "Bearer {}".format(receiver_cred.get("access_token"))}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 1
+    # test user cannot send message to block user
+
+    response = client.post(
+        "/message/154", json={"content": "dm 1"}, headers={"Authorization": "Bearer {}".format(sender_cred.get("access_token"))}
+    )
+    data = response.json()
+    assert response.status_code == 400
+    assert data.get("detail") == "Cannot send message to blocked user"
+
+    pass

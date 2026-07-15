@@ -14,11 +14,11 @@ class UserBlocking(db.DBModel):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement="auto")
 
     blocking_user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="cascade"), primary_key=True, nullable=False
+        ForeignKey("users.id", ondelete="cascade"), nullable=False
     )
     #followed: Mapped['User'] = relationship("User", foreign_keys=[blocking_user_id])
     blocked_by_user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="cascade"), primary_key=True,nullable=False
+        ForeignKey("users.id", ondelete="cascade"), nullable=False
     )
     #follower: Mapped['User'] = relationship("User", foreign_keys=[blocked_by_user_id])
 

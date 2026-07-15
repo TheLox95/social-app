@@ -15,7 +15,7 @@ class User(db.DBModel):
     fullname: Mapped[str] = mapped_column(String(35))
     password: Mapped[str] = mapped_column(String(256))
     email: Mapped[str] = mapped_column(String())
-    username: Mapped[str] = mapped_column(String(18), unique=True)
+    username: Mapped[str] = mapped_column(String(32), unique=True)
 
     posts: Mapped[list['Post']] = relationship("Post",back_populates="user", passive_deletes=True)
     followed_by: Mapped[List['UserFollowing']] = relationship("UserFollowing", foreign_keys=[UserFollowing.follower_user_id])

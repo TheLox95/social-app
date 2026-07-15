@@ -5,6 +5,7 @@ Revises: 55c8a10d2dd9
 Create Date: 2026-07-10 20:30:06.321273
 
 """
+
 import os
 from typing import Sequence, Union
 
@@ -13,13 +14,14 @@ import sqlalchemy as sa
 from sqlalchemy.orm import sessionmaker
 
 from models.user import User
+from models.user_blocking import UserBlocking
 from models.post import Post
 from models.post_comment import PostComment
 from models.post_like import PostLike
 
 # revision identifiers, used by Alembic.
-revision: str = '008c1dee1516'
-down_revision: Union[str, Sequence[str], None] = '55c8a10d2dd9'
+revision: str = "008c1dee1516"
+down_revision: Union[str, Sequence[str], None] = "55c8a10d2dd9"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -32,12 +34,11 @@ db_url = "postgresql://{}:{}@{}:{}/{}".format(
 )
 
 
-
 def upgrade() -> None:
     """Upgrade schema."""
     conn = op.get_context().connection
     context.configure(connection=conn)
-    
+
     session = sessionmaker(bind=context.get_bind())()
     user = User(
         email="poster1@mail.com",
@@ -98,7 +99,19 @@ def upgrade() -> None:
         username="follower_user1",
     )
 
-    session.add_all([user, edit_user, del_user, like_user, liked_user, commented_user, commenter_user, followed_user, follower_user  ])
+    session.add_all(
+        [
+            user,
+            edit_user,
+            del_user,
+            like_user,
+            liked_user,
+            commented_user,
+            commenter_user,
+            followed_user,
+            follower_user,
+        ]
+    )
     session.flush()
 
     posts = [

@@ -9,7 +9,7 @@ from alembic import context
 
 from dotenv import load_dotenv
 from db.db import DBModel
-from models import user, post, user_blocking, user_following
+from models import direct_message, user, post, user_blocking, user_following
 
 load_dotenv()
 
@@ -24,7 +24,13 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-target_metadata = [user.User.metadata, post.Post.metadata,user_blocking.UserBlocking.metadata, user_following.UserFollowing.metadata]
+target_metadata = [
+    user.User.metadata,
+    post.Post.metadata,
+    user_blocking.UserBlocking.metadata,
+    user_following.UserFollowing.metadata,
+    direct_message.DirectMessage.metadata,
+]
 target_metadata = DBModel.metadata
 
 # other values from the config, defined by the needs of env.py,
@@ -65,7 +71,13 @@ def run_migrations_online() -> None:
 
     """
     configuration = config.get_section(config.config_ini_section, {})
-    db_url = "postgresql://{}:{}@{}:{}/{}".format(os.getenv("DB_USER"), os.getenv("DB_PASSWORD"), os.getenv("DB_HOST"), os.getenv("DB_PORT"), os.getenv("DB_NAME") )
+    db_url = "postgresql://{}:{}@{}:{}/{}".format(
+        os.getenv("DB_USER"),
+        os.getenv("DB_PASSWORD"),
+        os.getenv("DB_HOST"),
+        os.getenv("DB_PORT"),
+        os.getenv("DB_NAME"),
+    )
     configuration["sqlalchemy.url"] = db_url
     connectable = engine_from_config(
         configuration=configuration,
@@ -74,9 +86,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

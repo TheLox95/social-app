@@ -14,11 +14,11 @@ class UserFollowing(db.DBModel):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement="auto")
 
     following_user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="cascade"), primary_key=True, nullable=False
+        ForeignKey("users.id", ondelete="cascade"), nullable=False
     )
     followed: Mapped['User'] = relationship("User", foreign_keys=[following_user_id])
     follower_user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="cascade"), primary_key=True,nullable=False
+        ForeignKey("users.id", ondelete="cascade"), nullable=False
     )
     follower: Mapped['User'] = relationship("User", foreign_keys=[follower_user_id])
 
