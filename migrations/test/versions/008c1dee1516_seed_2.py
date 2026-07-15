@@ -84,14 +84,21 @@ def upgrade() -> None:
         fullname="joe doe",
         username="commenter",
     )
+    followed_user = User(
+        id=100,
+        email="followed_user1@mail.com",
+        password="$argon2id$v=19$m=65536,t=3,p=4$wFBCoZUQcRxZSw4WOdXt4A$ubCqS8YRZ0I/c2S72rcD9jdrD9hcxkXkRs4yX7FeTIU",
+        fullname="joe doe",
+        username="followed_user1",
+    )
+    follower_user = User(
+        email="follower_user1@mail.com",
+        password="$argon2id$v=19$m=65536,t=3,p=4$wFBCoZUQcRxZSw4WOdXt4A$ubCqS8YRZ0I/c2S72rcD9jdrD9hcxkXkRs4yX7FeTIU",
+        fullname="joe doe",
+        username="follower_user1",
+    )
 
-    session.add(user)
-    session.add(edit_user)
-    session.add(del_user)
-    session.add(like_user)
-    session.add(liked_user)
-    session.add(commented_user)
-    session.add(commenter_user)
+    session.add_all([user, edit_user, del_user, like_user, liked_user, commented_user, commenter_user, followed_user, follower_user  ])
     session.flush()
 
     posts = [
