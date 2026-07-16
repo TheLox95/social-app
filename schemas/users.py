@@ -1,5 +1,9 @@
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from typing import Annotated
+
+from pydantic import BaseModel, ConfigDict, PlainSerializer, field_validator
+
+from models.app_notification import NotificationKind
 
 
 class MessageUserRequest(BaseModel):
@@ -13,5 +17,13 @@ class MessageUserRequest(BaseModel):
 class MessageListResponse(BaseModel):
     sender_user_id: int
     content: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+class NotificationsResponse(BaseModel):
+    event_type: Annotated[NotificationKind, PlainSerializer(lambda v: v.name, return_type=str)]
+    author_id: int
+    resource_id: str
+    is_read: bool
 
     model_config = ConfigDict(from_attributes=True)

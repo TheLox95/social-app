@@ -194,6 +194,16 @@ def test_like_post():
     assert found is not None
     assert len(found.get("likes")) == 0
 
+    # should notifications be sent 5 minutes after it happens?
+    response = client.get(
+        "/notifications", headers={"Authorization": "Bearer {}".format(data.get("access_token"))}
+    )
+    assert response.status_code == 200
+    notifications = response.json()
+    found = next((n for n in notifications if n.get("event_type") == "LIKE" and n.get("author_id") == 118), None)
+    assert found is not None
+
+
 def test_comment_post():
     response = client.post(
         "/login", json={"email": "commenter1@mail.com", "password": "123456Abc!"}
@@ -223,3 +233,12 @@ def test_comment_post():
     found = next((p for p in posts if p.get("id") == post_id), None)
     assert found is not None
     assert len(found.get("comments")) == 1
+    
+    response = client.get(
+        "/notifications", headers={"Authorization": "Bearer {}".format(data.get("access_token"))}
+    )
+    assert response.status_code == 200
+    notifications = response.json()
+    found = next((n for n in notifications if n.get("event_type") == "COMMENT" and n.get("author_id") == 132), None)
+    assert found is not None
+

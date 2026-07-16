@@ -9,7 +9,7 @@ from alembic import context
 
 from dotenv import load_dotenv
 from db.db import DBModel
-from models import direct_message, user, post, user_blocking, user_following
+from models import direct_message, user, post, user_blocking, user_following, app_notification
 
 load_dotenv()
 
@@ -30,6 +30,7 @@ target_metadata = [
     user_blocking.UserBlocking.metadata,
     user_following.UserFollowing.metadata,
     direct_message.DirectMessage.metadata,
+    app_notification.AppNotification.metadata,
 ]
 target_metadata = DBModel.metadata
 

@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from db.db import get_db
+from models.app_notification import AppNotification, NotificationKind
 from models.user_auth import UserAuth
 from schemas.post import (
     CommentPostRequest,
@@ -117,6 +118,8 @@ def like_post_request(
 
     if like_found is None:
         like_post(LikePostParams(post_id=post_id, author_id=usr.id), session)
+        notf = AppNotification(event_type=NotificationKind.LIKE, author_id=usr.id, resource_id=post_id, receiver_id=post.user_id)
+        session.add(notf)
     else:
         delete_like_post(
             DeleteLikePostParams(post_id=post_id, author_id=usr.id, like_id=like_found.id), session
@@ -133,6 +136,11 @@ def comment_post_request(
     session: Session = Depends(get_db),
     usr: UserAuth = Depends(get_token_data),
 ):
+    post_id = body.post_id.__str__()
+    post = find_post(FindPostParams(id=post_id, include_likes=True), session).first()
+    if post is None:
+        raise HTTPException(status_code=404, detail="Post not found")
+
     comment_post(
         CommentPostParams(
             post_id=body.post_id.__str__(),
@@ -142,6 +150,8 @@ def comment_post_request(
         ),
         session,
     )
+    notf = AppNotification(event_type=NotificationKind.COMMENT, author_id=usr.id, resource_id=post_id, receiver_id=post.user_id)
+    session.add(notf)
     session.commit()
 
     return {"succes": True}

@@ -7,11 +7,12 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 
 from db import db
+from models.app_notification import AppNotification, NotificationKind
 from models.direct_message import DirectMessage
 from models.user import User
 from models.user_auth import UserAuth
 from models.user_blocking import UserBlocking
-from schemas.users import MessageListResponse, MessageUserRequest
+from schemas.users import MessageListResponse, MessageUserRequest, NotificationsResponse
 from services.auth import get_token_data
 from services.user import (
     FindUsersParams,
@@ -64,8 +65,12 @@ async def follow_user_route(
             follow_user(
                 FollowUserParams(follower_id=user_id, following_id=usr.id), session
             )
+            notf = AppNotification(event_type=NotificationKind.FOLLOW, author_id=usr.id, resource_id=usr.id, receiver_id=user_id)
+            session.add(notf)
     else:
         follow_user(FollowUserParams(follower_id=user_id, following_id=usr.id), session)
+        notf = AppNotification(event_type=NotificationKind.FOLLOW, author_id=usr.id, resource_id=usr.id, receiver_id=user_id)
+        session.add(notf)
 
     session.commit()
     return {"success": True}
@@ -85,7 +90,6 @@ async def block_user_route(
         found = next(
             (u for u in user.blocked_by if u.blocked_by_user_id == usr.id), None
         )
-        print(found)
         if found is not None:
             delete_block_user(
                 BlockUserParams(blocking_user_id=user_id, blocked_by_user_id=usr.id),
@@ -139,6 +143,8 @@ async def send_message_user_route(
         sender_user_id=usr.id, receiver_user_id=user_id, content=body.content
     )
     session.add(dm)
+    notf = AppNotification(event_type=NotificationKind.DM, author_id=usr.id, resource_id=usr.id, receiver_id=user_id)
+    session.add(notf)
     session.commit()
     return {"success": True}
 
@@ -150,3 +156,12 @@ async def get_message_user_route(
     query = select(DirectMessage).where(DirectMessage.receiver_user_id == usr.id)
     messages = session.scalars(query).all()
     return messages
+
+@router.get("/notifications", response_model=List[NotificationsResponse])
+async def get_notifications_route(
+    usr: UserAuth = Depends(get_token_data), session: Session = Depends(db.get_db)
+):
+    query = select(AppNotification).where(AppNotification.receiver_id == usr.id)
+    messages = session.scalars(query).all()
+    return messages
+

@@ -62,24 +62,28 @@ def upgrade() -> None:
         username="poster4",
     )
     like_user = User(
+        id=118,
         email="like1@mail.com",
         password="$argon2id$v=19$m=65536,t=3,p=4$wFBCoZUQcRxZSw4WOdXt4A$ubCqS8YRZ0I/c2S72rcD9jdrD9hcxkXkRs4yX7FeTIU",
         fullname="joe doe",
         username="like1",
     )
     liked_user = User(
+        id=120,
         email="liked1@mail.com",
         password="$argon2id$v=19$m=65536,t=3,p=4$wFBCoZUQcRxZSw4WOdXt4A$ubCqS8YRZ0I/c2S72rcD9jdrD9hcxkXkRs4yX7FeTIU",
         fullname="joe doe",
         username="liked1",
     )
     commented_user = User(
+        id=130,
         email="commented1@mail.com",
         password="$argon2id$v=19$m=65536,t=3,p=4$wFBCoZUQcRxZSw4WOdXt4A$ubCqS8YRZ0I/c2S72rcD9jdrD9hcxkXkRs4yX7FeTIU",
         fullname="joe doe",
         username="commented1",
     )
     commenter_user = User(
+        id=132,
         email="commenter1@mail.com",
         password="$argon2id$v=19$m=65536,t=3,p=4$wFBCoZUQcRxZSw4WOdXt4A$ubCqS8YRZ0I/c2S72rcD9jdrD9hcxkXkRs4yX7FeTIU",
         fullname="joe doe",
@@ -93,6 +97,7 @@ def upgrade() -> None:
         username="followed_user1",
     )
     follower_user = User(
+        id=140,
         email="follower_user1@mail.com",
         password="$argon2id$v=19$m=65536,t=3,p=4$wFBCoZUQcRxZSw4WOdXt4A$ubCqS8YRZ0I/c2S72rcD9jdrD9hcxkXkRs4yX7FeTIU",
         fullname="joe doe",

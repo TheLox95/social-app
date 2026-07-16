@@ -50,6 +50,15 @@ def test_follow_user():
     profile = response.json()
     assert len(profile.get("followed_by")) == 0
 
+    response = client.get(
+        "/notifications", headers={"Authorization": "Bearer {}".format(followed_cred.get("access_token"))}
+    )
+    assert response.status_code == 200
+    notifications = response.json()
+    found = next((n for n in notifications if n.get("event_type") == "FOLLOW" and n.get("author_id") == 140), None)
+    assert found is not None
+
+
 def test_block_user():
     response = client.post(
         "/login", json={"email": "follower_user1@mail.com", "password": "123456Abc!"}
@@ -87,6 +96,7 @@ def test_block_user():
     assert response.status_code == 200
     profile = response.json()
     assert len(profile.get("blocked_by")) == 0
+    # should unfollow user
 
 def test_directmessage_user():
     # test user exist
@@ -129,4 +139,11 @@ def test_directmessage_user():
     assert response.status_code == 400
     assert data.get("detail") == "Cannot send message to blocked user"
 
-    pass
+    response = client.get(
+        "/notifications", headers={"Authorization": "Bearer {}".format(receiver_cred.get("access_token"))}
+    )
+    assert response.status_code == 200
+    notifications = response.json()
+    found = next((n for n in notifications if n.get("event_type") == "DM" and n.get("author_id") == 150), None)
+    assert found is not None
+
